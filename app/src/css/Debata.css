@@ -1,0 +1,30 @@
+
+.debata1{
+    color: aliceblue;
+    background-color: rgba(70,70,70,0.4 );
+    padding-top: 20px;
+    padding-bottom: 20px;   
+    width: max-content; 
+    margin-top: 10vh;
+}
+
+.uskoro1{
+    color:yellow;
+}
+.trenutno{
+    color:green;
+}
+.zavrseno{
+    color:red;
+}
+.closebtn{
+    top: -400px;
+    left: 0px;
+}
+.links{
+    text-decoration: none;
+    color:white;
+}
+.links:hover{
+    color: #bd0010;
+}

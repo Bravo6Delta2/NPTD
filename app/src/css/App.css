@@ -1,0 +1,87 @@
+
+
+.sticky{
+  position: -webkit-sticky;
+    position: sticky;
+    top:0px;
+    z-index: 3;
+}
+.headq{
+  color:whitesmoke;
+  background-color: black;
+}
+.debata{
+  text-decoration: none;
+  color:whitesmoke;
+  margin:10px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800 !important;
+  font-size: 32px;
+}
+.red{
+  color:  #bd0010;
+  font-weight: 800 !important;
+}
+
+.nesto{
+  text-decoration: none;
+  color:whitesmoke;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 20px;
+}
+.nesto:hover{
+  color: #bd0010;;
+}
+body{
+
+  background-image:url(4.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+
+.futer{
+  color: white;
+  padding: 25px 0;
+  box-shadow: border-box;
+  background-color: black;
+  margin-top: 60px;
+   z-index: 10;
+   bottom: 0;
+
+   width: 100%;
+   
+}
+.sredinaFutera{
+  display: block;
+  margin: 0 auto;
+}
+.sadrzajFutera{
+  color: white;
+}
+.logo{
+
+  display: table;
+  float: left;
+}
+#crta{
+    color: #bd0010;
+    font-size: 70px;
+    font-weight: 100;
+}
+
+.float{
+    color: white;
+     /*-40*/
+   /* float: right; */
+}
+.margins111{
+ margin-top: 50px;
+}
+.margins11{
+  margin-top: 30px;
+ }
+ .min{
+   min-height: 410px;
+ }

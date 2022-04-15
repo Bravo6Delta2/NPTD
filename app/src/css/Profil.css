@@ -1,0 +1,38 @@
+
+.margins{
+    margin-left: 15vw;
+    margin-right: 15vw;
+    margin-top: 20px;
+}
+.dugme{
+    width: max-content;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-left: 10vw;
+}
+.xxs{
+    color: white;
+}
+.pading{
+    margin-top: 20px;
+    border: 2px solid gray;
+    padding: 20px;
+    margin-left: 10vw;
+    margin-right: 10vw;
+    border-radius: 12px;
+}
+.slect{
+    color:#e0d2d2;
+    padding-right: 20px;
+}
+.slect>option{
+    color:rgba(40,40,40,1);
+}
+.slect>option:hover{
+    color: aliceblue;
+    background-color: #bd0010;
+    
+}
+.dd1{
+    width: 100%;
+}

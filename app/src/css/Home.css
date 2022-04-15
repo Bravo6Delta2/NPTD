@@ -1,0 +1,34 @@
+.margins{
+
+    margin-left: 18vw;
+    margin-right: 18vw;
+    margin-top: 20px;
+    
+}
+
+.colore{
+
+    color: white;
+}
+
+.links{
+    text-decoration: none;
+    color: white;
+}
+
+.links:hover{
+  color:  #bd0010;
+  
+}
+.t1{
+    width: 80%;
+}
+.tr1{
+    width: 40%;
+}
+.tr2{
+    width: 30%;
+}
+.t3{
+    width: 20%;
+}
