@@ -46,7 +46,7 @@ app.post('/login', async(req,res)=>{
             res.json(ret);
             return;
         }
-        tok = jwt.sign( {email : req.body.email},'aaaaaaaaaa',{expiresIn : '1h'});
+        tok = jwt.sign( {email : req.body.email,ime:rows[0].ime},'aaaaaaaaaa',{expiresIn : '4h'});
         ret.token = tok;
         ret.msg ='GG';
         res.statusCode = 200;
@@ -131,7 +131,7 @@ app.post('/register/',async (req,res)=>{
         let link_2 = bbb_api.administration.join('attendee', xxx, 'secret')
         let link_3 = bbb_api.administration.end(xxx, 'supersecret')
     
-        const xx1 = await (await pool.query('INSERT INTO DEBATA (EMAIL,LINK_1,LINK_2,LINK_3,NAZIV,DUZINA,OPIS,DATUM,STAGE,KAT) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10);',[email1,link_1,link_2,link_3,req.body.name,req.body.duration,req.body.description,req.body.date,1,req.body.category])).rows;
+        const xx1 = await (await pool.query('INSERT INTO DEBATA (EMAIL,LINK_1,LINK_2,LINK_3,NAZIV,DUZINA,OPIS,DATUM,STAGE,KAT,PRIVATNA,PUSTI,reports) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,false,false,0);',[email1,link_1,link_2,link_3,req.body.name,req.body.duration,req.body.description,req.body.date,1,req.body.category])).rows;
         
         res.statusCode = 200;
         ret.msg = 'GG'; 
@@ -171,7 +171,7 @@ app.post('/register/',async (req,res)=>{
        let email =  jwt.verify(req.body.tkn,'aaaaaaaaaa')
         const pool = new Pool(db_cred);
         let offset = (req.body.page-1)*10;
-        const {rows} = await pool.query('SELECT NAZIV,LINK_1,LINK_3,LINK_2,ID,pusti,privatna FROM DEBATA WHERE EMAIL = $1 OFFSET $2 LIMIT 10;',[email.email,offset]);
+        const {rows} = await pool.query('SELECT NAZIV,LINK_1,LINK_3,LINK_2,ID,pusti,privatna,stage FROM DEBATA WHERE EMAIL = $1 OFFSET $2 LIMIT 10;',[email.email,offset]);
         if (rows.length==0){
             res.statusCode = 200;
             ret.msg = 'pr1';
@@ -207,7 +207,8 @@ app.post('/register/',async (req,res)=>{
     }
     try{
         const pool = new Pool(db_cred);
-        const {rows} = await pool.query('SELECT d.id,d.NAZIV,d.LINK_2,e.ime,e.prezime FROM debata d INNER JOIN profili e on d.email = e.email;');
+        let offset = (req.body.page-1)*10;
+        const {rows} = await pool.query('SELECT d.id,d.NAZIV,d.LINK_2,e.ime,e.prezime FROM debata d INNER JOIN profili e on d.email = e.email where d.kat = $1 and d.stage=1 offset $2 limit 10;',[req.body.kat,offset]);
         if (rows.length==0){
             res.statusCode = 200;
             ret.msg = 'pr1';
@@ -240,7 +241,7 @@ app.post('/register/',async (req,res)=>{
     }
     try{
         const pool = new Pool(db_cred);
-        const {rows} = await pool.query('SELECT e.ime,e.prezime,d.duzina,d.opis,d.datum,d.stage,d.kat FROM debata d INNER JOIN profili e on d.email = e.email where d.id=$1;',[req.body.id]);
+        const {rows} = await pool.query('SELECT e.ime,e.prezime,d.duzina,d.opis,d.datum,d.stage,d.kat,d.id FROM debata d INNER JOIN profili e on d.email = e.email where d.id=$1;',[req.body.id]);
         if (rows.length==0){
             res.statusCode = 200;
             ret.msg = 'pr1';
@@ -308,4 +309,276 @@ app.post('/setprivate',async (req,res)=>{
  }
 ) 
 
+app.post('/ugasi',async (req,res)=>{
+    
+        let ret = {msg:''};
+        if (!req.body){
+            ret.msg = 'Neuspjesno';
+            res.sendStatus = 200;
+            res.json(ret);
+            return;
+        }
+        try{
+            let x = 0;
+            const pool = new Pool(db_cred);
+            if (req.body.pass){
+
+                let xxx = (await pool.query('SELECT * FROM user WHERE PASS = $1;',[req.body.pass])).rows; 
+                if (xxx.length==0){
+                    res.statusCode = 200;
+                    ret.msg = 'pr1';
+                    res.json(ret);
+                    return;
+                }
+                x = await (await pool.query('UPDATE DEBATA SET STAGE = 4 WHERE ID = $1;',([req.body.id]))).rows;
+            }
+            else{
+                let email =  jwt.verify(req.body.tkn,'aaaaaaaaaa')
+                 x = await (await pool.query('UPDATE DEBATA SET STAGE = 3 WHERE ID = $1 AND EMAIL = $2;',([req.body.id,email.email]))).rows;
+
+            }
+           
+            
+            if (x.length==0){
+                res.statusCode = 200;
+                ret.msg = 'pr1';
+                res.json(ret);
+                return;
+            }
+            res.statusCode = 200;
+            ret.msg = 'GG';
+            res.json(ret);
+            return;
+        }
+        catch(error){
+            console.log(error);
+            res.statusCode = 200;
+            ret.msg = 'Xd';
+            res.json(ret);
+        }
+    
+    }
+)
+
+app.post('/invitations',async (req,res)=>{
+
+    let ret = {msg:'',data:null};
+    if (!req.body){
+        ret.msg = 'Neuspjesno';
+        res.sendStatus = 200;
+        res.json(ret);
+        return;
+    }
+    try{
+        let email =  jwt.verify(req.body.tkn,'aaaaaaaaaa')
+        const pool = new Pool(db_cred);
+        const {rows} = await pool.query('Select i.id,d.naziv,d.privatna from pozivnica i inner join debata d on i.id=d.id where prihvatio is null and i.primalac=$1;',[email.email]);
+        if (rows.length==0){
+            res.statusCode = 200;
+            ret.msg = 'pr1';
+            res.json(ret);
+            return;
+        }
+        res.statusCode = 200;
+        ret.data = rows;
+        ret.msg = 'GG';
+        res.json(ret);
+        return;
+    }
+    catch(error){
+        console.log(error);
+        res.statusCode = 200;
+        ret.msg = 'Xd';
+        res.json(ret);
+      }
+
+})
+
+app.post('/accept',async (req,res)=>{
+    
+        let ret = {msg:'',data:null};
+        if (!req.body){
+            ret.msg = 'Neuspjesno';
+            res.sendStatus = 200;
+            res.json(ret);
+            return;
+        }
+        try{
+            let email =  jwt.verify(req.body.tkn,'aaaaaaaaaa')
+            const pool = new Pool(db_cred);
+            const {rows} = await pool.query('UPDATE pozivnica SET prihvatio = $1 WHERE id = $2 AND primalac=$3;',[req.body.prihvatio,req.body.id,email.email]);
+          
+            res.statusCode = 200;
+            ret.msg = 'GG';
+            res.json(ret);
+            return;
+        }
+        catch(error){
+            console.log(error);
+            res.statusCode = 200;
+            ret.msg = 'Xd';
+            res.json(ret);
+        }
+    
+})
+
+app.post('/td',async (req,res)=>{
+
+    let ret = {msg:'',data:null};
+    if (!req.body){
+        ret.msg = 'Neuspjesno';
+        res.sendStatus = 200;
+        res.json(ret);
+        return;
+    }
+    try{
+        let email =  jwt.verify(req.body.tkn,'aaaaaaaaaa')
+        const pool = new Pool(db_cred);
+        let x;
+        if(req.body.kind == 0){
+            x = (await pool.query('Select i.id,link_2,datum,naziv,privatna from debata d inner join pozivnica i on d.id = i.id where i.prihvatio = true and d.stage < 3 and i.primalac = $1;',[email.email])).rows;
+        }
+        if(x.length==0){
+            res.statusCode = 200;
+            ret.msg = 'pr1';
+            res.json(ret);
+            return;
+        }
+        res.statusCode = 200;
+        ret.msg = 'GG';
+        ret.data = x;
+        res.json(ret);
+        return;
+    }
+    catch(error){
+        console.log(error);
+        res.statusCode = 200;
+        ret.msg = 'Xd';
+        res.json(ret);
+    }
+
+})
+
+
+app.post('/report',async (req,res)=>{
+
+    let ret = {msg:''};
+    if (!req.body){
+        ret.msg = 'Neuspjesno';
+        res.sendStatus = 200;
+        res.json(ret);
+        return;
+    }
+    try{
+
+        const pool = new Pool(db_cred);
+        const {rows} = await pool.query('UPDATE debata SET reports = reports + 1 WHERE id = $1;',[req.body.id]);
+         
+        if (rows.length == 0){
+            res.statusCode = 200;
+            ret.msg = 'pr1';
+            res.json(ret);
+            return;
+        }
+        res.statusCode = 200;
+        ret.msg = 'GG';
+        res.json(ret);
+        return;
+    }
+    catch(error){
+
+        console.log(error);
+        res.statusCode = 200;
+        ret.msg = 'Xd';
+        res.json(ret);
+    }
+})
+
+app.post('/reports',async (req,res)=>{
+
+    let ret = {msg:''};
+    if (!req.body){
+        ret.msg = 'Neuspjesno';
+        res.sendStatus = 200;
+        res.json(ret);
+        return;
+    }
+    try{
+
+        const pool = new Pool(db_cred);
+        const {rows} = await pool.query('SELECT * FROM admin WHERE pass = $1;',[req.body.pass]);
+
+        if (rows.length == 0){
+            res.statusCode = 200;
+            ret.msg = 'pr1';
+            res.json(ret);
+            return;
+        }
+        offset = (req.body.page-1)*10;
+        const xx = await (await pool.query('SELECT * from debata d inner join profili e on d.email=e.email where reports > 10 offset $1 limit 10',[offset])).rows;
+         
+        if (rows.length == 0){
+            res.statusCode = 200;
+            ret.msg = 'pr2';
+            res.json(ret);
+            return;
+        }
+        ret.data = xx;
+        res.statusCode = 200;
+        ret.msg = 'GG';
+        res.json(ret);
+        return;
+    }
+    catch(error){
+
+        console.log(error);
+        res.statusCode = 200;
+        ret.msg = 'Xd';
+        res.json(ret);
+    }
+})
+
+
+app.post('/loga',async (req,res)=>{
+
+    let ret = {msg:''};
+    if (!req.body){
+        ret.msg = 'Neuspjesno';
+        res.sendStatus = 200;
+        res.json(ret);
+        return;
+    }
+    try{
+        const pool = new Pool(db_cred);
+        const {rows} = await pool.query('SELECT * FROM admin WHERE pass = $1;',[req.body.pass]);
+
+        if (rows.length == 0){
+            res.statusCode = 200;
+            ret.msg = 'pr1';
+            res.json(ret);
+            return;
+        }
+        res.statusCode = 200;
+        ret.msg = 'GG';
+        res.json(ret);
+        return;
+    }
+    catch(error){
+
+        console.log(error);
+        res.statusCode = 200;
+        ret.msg = 'Xd';
+        res.json(ret);
+    }
+})
+
+
+setInterval(function(){ 
+    //this code runs every second 
+    const pool = new Pool(db_cred);
+    pool.query('UPDATE debata SET stage = stage + 1 WHERE stage = 1 and datum < LOCALTIMESTAMP;').then(
+        (res)=>{},
+        (err)=>{console.log(err);}
+    );
+}, 1000);
 http.createServer(app).listen(3001);

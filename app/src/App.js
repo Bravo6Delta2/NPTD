@@ -14,6 +14,8 @@ import ins from "./galerija/instagram.png"
 import puz from "./galerija/puzzle.png"
 import logo from "./galerija/logoo.png"
 import Debata from './Debata.js';
+import Admin from './Admin';
+import Info from './Info';
 class App extends React.Component {
   
   render(){
@@ -32,16 +34,18 @@ class App extends React.Component {
         <div ata-spy="affix" data-offset-top="197">
           <div className='sticky d-sm-flex justify-content-sm-evenly headq'>
             <Link to='/' className='d-sm-flex debata'>DEBATUJ<span className='red'>.</span>MO</Link>
-            <Link to='/' className='d-sm-flex nesto'>O nama</Link>
+            <Link to='/info' className='d-sm-flex nesto'>O nama</Link>
             <Link to={y} className='d-sm-flex nesto'>{x}</Link>
           </div>
     <div className='min'>
         <Switch >
-            <Route exact path='/debata' component={Debata}/>
+            <Route path='/debata/' component={Debata}/>
             <Route exact path='/'  component={Home}/>
             <Route exact path='/login'  component={Login}/>
             <Route exact path='/register'  component={Register}/>
+            <Route exact path='/admin'  component={Admin}/>
             <Guard path='/profil' component={Profil}/>
+            <Route exact path='/info'  component={Info}/>
             
         </Switch>        
         </div>

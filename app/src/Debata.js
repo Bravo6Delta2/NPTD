@@ -1,11 +1,13 @@
 import axios from 'axios';
 import React from 'react';
-import "./css/Debata.css"
+import "./css/Debata.css";
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 class Debata extends React.Component{
 
     constructor(props){
         super(props);
-        this.state={id:props.location.id}
+        
+        this.state={id:window.location.pathname.split('/')[2]}
     }
     componentDidMount(){
     
@@ -20,7 +22,6 @@ class Debata extends React.Component{
                         data:res.data.data,
                         msg:res.data.msg,
                     })
-                    console.log(this.state)
                 }
             },
             (err)=>{}
@@ -51,7 +52,7 @@ class Debata extends React.Component{
                                         }
                                     })()}</h3>
                 <h3>ORGANIZATOR : {this.state.data.ime} {this.state.data.prezime}</h3><br/>
-                <h3>DATUM : {this.state.data.datum}</h3> <h3>DUZINA : {this.state.data.duzina}</h3><br/>
+                <h3>DATUM : {this.state.data.datum}</h3> <h3>DUZINA : {this.state.data.duzina} minuta</h3><br/>
                 <h3>KATEGORIJA : {(() => {
                                         switch (this.state.data.kat) {
                                         case 1:   return "PROGRAMIRANJE";
@@ -61,6 +62,7 @@ class Debata extends React.Component{
                                     })()}</h3>
                <center><h3>OPIS : </h3></center> 
                 <p>{this.state.data.opis}</p>
+                <button className='btn btn-primary'>PRIJAVI DEBATU</button>
             </div>
         )
 
